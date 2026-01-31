@@ -3,225 +3,741 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relógio Cósmico</title>
+    <title>PRIMEIRA HORA</title>
     <style>
-        body {
-            background: #000;
-            color: #fff;
-            text-align: center;
-            font-family: 'Arial', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Courier+Prime:wght@400;700&family=Special+Elite&display=swap');
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: #000;
             overflow: hidden;
-            user-select: none;
+            cursor: crosshair;
         }
-        #container {
+
+        /* VHS and Glitch Effects */
+        @keyframes vhsDistortion {
+            0% { transform: translateX(0); }
+            10% { transform: translateX(-2px) skewX(0.5deg); }
+            20% { transform: translateX(2px) skewX(-0.5deg); }
+            30% { transform: translateX(0); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes glitchFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            51% { opacity: 1; }
+            52% { opacity: 0.9; }
+            53% { opacity: 1; }
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
             position: relative;
-            width: 600px;
-            height: 750px;
-            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
+            animation: vhsDistortion 0.3s infinite;
         }
-        #forca {
-            font-size: 24px;
-            letter-spacing: 5px;
-            margin: 20px 0;
-            height: 30px;
-            color: #f1e05a;
-        }
-        #tentativas {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #e35d5d;
-        }
-        #clock-face {
+
+        /* VHS Scanlines Effect */
+        .game-container::before {
+            content: '';
             position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 500px;
-            height: 500px;
-            border: 8px solid #333;
-            border-radius: 50%;
-            background: #111;
-            box-shadow: 0 0 30px rgba(241, 224, 90, 0.3);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.15) 3px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanlines 10s linear infinite;
+            opacity: 0.3;
         }
-        .hour-marker {
+
+        /* VHS Noise Overlay */
+        .game-container::after {
+            content: '';
             position: absolute;
-            width: 4px;
-            height: 20px;
-            background: #f1e05a;
-            left: 50%;
-            margin-left: -2px;
-            transform-origin: 50% 250px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.5;
+            mix-blend-mode: overlay;
         }
-        .letter-btn {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: #f1e05a;
-            color: #000;
-            border-radius: 50%;
+
+        .image-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            background: #000;
+        }
+
+        .game-image {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(1.02);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            filter: contrast(1.3) brightness(0.8) saturate(0.7) sepia(0.3) hue-rotate(5deg);
+            animation: glitchFlicker 4s infinite;
+        }
+
+        .game-image.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Chromatic Aberration Effect */
+        .game-image.glitch {
+            animation: imageGlitch 0.3s infinite;
+        }
+
+        @keyframes imageGlitch {
+            0% {
+                filter: contrast(1.3) brightness(0.8) saturate(0.7) sepia(0.3);
+                transform: translate(0, 0);
+            }
+            20% {
+                filter: contrast(1.5) brightness(0.6) saturate(0.5) sepia(0.5);
+                transform: translate(-5px, 2px);
+            }
+            40% {
+                filter: contrast(1.3) brightness(0.8) saturate(0.7) sepia(0.3);
+                transform: translate(5px, -2px);
+            }
+            60% {
+                filter: contrast(1.4) brightness(0.7) saturate(0.6) sepia(0.4);
+                transform: translate(-2px, 3px);
+            }
+            80% {
+                filter: contrast(1.3) brightness(0.8) saturate(0.7) sepia(0.3);
+                transform: translate(2px, -3px);
+            }
+            100% {
+                filter: contrast(1.3) brightness(0.8) saturate(0.7) sepia(0.3);
+                transform: translate(0, 0);
+            }
+        }
+
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.9) 100%);
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        .dialogue-container {
+            height: 240px;
+            background: #0a0a0a;
+            border-top: 2px solid #333;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 25px 50px;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.9);
+        }
+
+        .dialogue-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(
+                90deg,
+                #666 0px,
+                #666 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+
+        .ornament {
+            position: absolute;
             font-size: 18px;
+            color: #666;
+            opacity: 0.5;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        .ornament.left {
+            left: 20px;
+            top: 15px;
+        }
+
+        .ornament.right {
+            right: 20px;
+            top: 15px;
+        }
+
+        .dialogue-text {
+            flex: 1;
+            color: #ccc;
+            font-size: 22px;
+            line-height: 1.6;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+            letter-spacing: 1px;
+            white-space: pre-line;
+            max-width: 900px;
+            margin: 0 auto;
+            font-family: 'VT323', monospace;
+            transition: opacity 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .control-btn {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #888;
+            padding: 10px 28px;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
             cursor: pointer;
-            border: none;
-            outline: none;
-            transform: translate(-50%, -50%);
-            transition: all 0.2s;
-            box-shadow: 0 0 10px rgba(241, 224, 90, 0.5);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
-        .letter-btn:hover {
-            background: #e3d847;
-            transform: translate(-50%, -50%) scale(1.1);
+
+        .control-btn:hover {
+            background: #222;
+            border-color: #666;
+            color: #aaa;
+            box-shadow: 0 0 15px rgba(100,100,100,0.3);
+            transform: translateY(-1px);
         }
-        #hour-hand, #minute-hand, #center-circle { z-index: 10; }
-        #hour-hand {
+
+        .control-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        .progress {
+            text-align: center;
+            color: #555;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .click-indicator {
             position: absolute;
-            width: 8px;
-            height: 120px;
+            bottom: 260px;
+            right: 40px;
+            color: #666;
+            font-size: 16px;
+            font-family: 'VT323', monospace;
+            animation: pulse 2s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(100,100,100,0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: translateX(0); }
+            50% { opacity: 0.7; transform: translateX(-5px); }
+        }
+
+        .title-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        .title-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .game-title {
+            font-family: 'Special Elite', cursive;
+            font-size: 84px;
+            font-weight: 700;
+            color: #888;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 12px;
+            filter: contrast(1.5);
+        }
+
+        @keyframes titleGlitch {
+            0%, 90%, 100% {
+                text-shadow: 2px 0 #ff0000, -2px 0 #00ffff;
+            }
+            91%, 93% {
+                text-shadow: 5px 0 #ff0000, -5px 0 #00ffff, 0 0 20px #fff;
+                transform: skewX(-5deg);
+            }
+            92%, 94% {
+                text-shadow: -5px 0 #ff0000, 5px 0 #00ffff;
+                transform: skewX(5deg);
+            }
+        }
+
+        .subtitle {
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 50px;
+            opacity: 0.7;
+            letter-spacing: 4px;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .start-btn {
+            background: #1a1a1a;
+            border: 3px solid #444;
+            color: #888;
+            padding: 18px 55px;
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .start-btn:hover {
+            background: #222;
+            border-color: #666;
+            color: #aaa;
+            box-shadow: 0 0 30px rgba(100,100,100,0.3);
+            transform: scale(1.05);
+        }
+
+        .start-btn::before {
+            content: '▶';
+            position: absolute;
+            left: 20px;
+            animation: blink 1.5s infinite;
+        }
+
+        /* Static noise particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 998;
+        }
+
+        .particle {
+            position: absolute;
+            width: 1px;
+            height: 1px;
             background: #fff;
-            left: 50%;
-            top: 130px;
-            margin-left: -4px;
-            transform-origin: 50% 120px;
-            border-radius: 4px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-            transform: rotate(180deg);
+            opacity: 0;
+            animation: staticNoise 0.1s infinite;
         }
-        #minute-hand {
-            position: absolute;
-            width: 6px;
-            height: 180px;
-            background: #f1e05a;
-            left: 50%;
-            top: 70px;
-            margin-left: -3px;
-            transform-origin: 50% 180px;
-            border-radius: 3px;
-            box-shadow: 0 0 10px rgba(241, 224, 90, 0.7);
-            transform: rotate(180deg);
+
+        @keyframes staticNoise {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
         }
-        #center-circle {
+
+        /* Timestamp overlay */
+        .timestamp {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            top: 20px;
+            right: 20px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            color: #ff0000;
+            z-index: 1001;
+            text-shadow: 0 0 5px #ff0000;
+            letter-spacing: 2px;
+        }
+
+        /* Warning overlay */
+        .warning {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            color: #888;
+            z-index: 1001;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* Red screen overlay - HIDDEN BY DEFAULT */
+        .red-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ff0000;
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="forca"></div>
-        <div id="tentativas">Tentativas restantes: <span id="contador">3</span></div>
-        <div id="clock-face">
-            <div id="hour-hand"></div>
-            <div id="minute-hand"></div>
-            <div id="center-circle"></div>
+    <!--
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║  MÚSICA DE FUNDO - COLOQUE O CAMINHO DO SEU ARQUIVO AQUI     ║
+    ╚═══════════════════════════════════════════════════════════════╝
+    -->
+    <audio id="backgroundMusic" loop>
+        <source src="SEU_ARQUIVO_DE_MUSICA.mp3" type="audio/mpeg">
+        <source src="audio_150.ogg" type="audio/ogg">
+        <!-- Exemplo: <source src="musica/horror_ambience.mp3" type="audio/mpeg"> -->
+    </audio>
+    <!--
+    Para adicionar música:
+    1. Coloque seu arquivo de áudio na mesma pasta do HTML
+    2. Substitua "SEU_ARQUIVO_DE_MUSICA.mp3" pelo nome do seu arquivo
+    3. A música começará automaticamente quando clicar em INICIAR
+    -->
+
+    <div class="particles" id="particles"></div>
+    <div class="red-screen" id="redScreen"></div>
+
+    <div class="title-screen" id="titleScreen">
+        <h1 class="game-title" style="animation: titleGlitch 3s ease-in-out infinite;">PRIMEIRA HORA</h1>
+        <p class="subtitle" style="animation: blink 2s infinite;">[ LOST FOOTAGE RECOVERED ]</p>
+        <button class="start-btn" onclick="startGame()">INICIAR</button>
+    </div>
+
+    <div class="game-container">
+        <div class="warning">⚠ PERDOEME</div>
+        <div class="timestamp" id="timestamp">00:00:00</div>
+
+        <div class="image-container">
+            <img id="gameImage" class="game-image" src="" alt="Corrupted footage">
+            <div class="vignette"></div>
+        </div>
+
+        <div class="click-indicator">PRESS TO CONTINUE ▶</div>
+
+        <div class="dialogue-container">
+            <span class="ornament left">█</span>
+            <span class="ornament right">█</span>
+            <div class="dialogue-text" id="dialogueText"></div>
+            <div class="controls">
+                <button class="control-btn" onclick="previousScene()">
+                    <span>◄ PREV</span>
+                </button>
+                <button class="control-btn" onclick="nextScene()">
+                    <span>NEXT ►</span>
+                </button>
+            </div>
+            <div class="progress" id="progress"></div>
         </div>
     </div>
+
     <script>
-        const SEQUENCIA_CORRETA = ["O","I","M","P","E","R","A","D","O","R","E","I","M","O","R","T","A","L"];
-        let sequenciaDigitada = [];
-        let tentativas = 3;
-
-        const centerX = 300;
-        const centerY = 300;
-        const letterRadius = 208;
-        const hourHand = document.getElementById('hour-hand');
-        const minuteHand = document.getElementById('minute-hand');
-        const clockFace = document.getElementById('clock-face');
-        const forcaDisplay = document.getElementById('forca');
-        const contadorDisplay = document.getElementById('contador');
-
-        function atualizarForca() {
-            forcaDisplay.textContent = SEQUENCIA_CORRETA
-                .map((l, i) => i < sequenciaDigitada.length ? l : '_')
-                .join(' ');
-        }
-
-        function atualizarTentativas() {
-            contadorDisplay.textContent = tentativas;
-            if (tentativas <= 0) {
-                alert('Sem tentativas restantes! Reiniciando.');
-                reiniciarJogo();
+        // Criar partículas de estática
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 150; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 0.1 + 's';
+                particlesContainer.appendChild(particle);
             }
         }
+        createParticles();
 
-        function verificarSequencia(letra) {
-            sequenciaDigitada.push(letra);
-            const corretoAteAqui = SEQUENCIA_CORRETA
-                .slice(0, sequenciaDigitada.length)
-                .every((l, idx) => l === sequenciaDigitada[idx]);
-
-            if (!corretoAteAqui) {
-                tentativas--;
-                atualizarTentativas();
-                sequenciaDigitada = [];
-                atualizarPonteiros(0);
-            }
-
-            if (sequenciaDigitada.length === SEQUENCIA_CORRETA.length && corretoAteAqui) {
-                window.open("a.mp4", "_blank");
-                reiniciarJogo();
-            }
-
-            atualizarForca();
+        // Timestamp simulado
+        function updateTimestamp() {
+            const timestamp = document.getElementById('timestamp');
+            let seconds = 0;
+            setInterval(() => {
+                seconds++;
+                const hours = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                timestamp.textContent = `${hours}:${minutes}:${secs}`;
+            }, 1000);
         }
 
-        function atualizarPonteiros(angulo) {
-            const pointerAngle = angulo;
-            hourHand.style.transform = `rotate(${pointerAngle}deg)`;
-            minuteHand.style.transform = `rotate(${pointerAngle}deg)`;
-        }
-
-        function reiniciarJogo() {
-            sequenciaDigitada = [];
-            tentativas = 3;
-            atualizarForca();
-            atualizarTentativas();
-            atualizarPonteiros(0);
-        }
-
-        function criarRelogio() {
-            const letras = ["O","I","M","P","E","R","A","D","T","L"];
-            for (let i = 0; i < 10; i++) {
-                const marker = document.createElement('div');
-                marker.className = 'hour-marker';
-                marker.style.transform = `rotate(${i * 36}deg)`;
-                clockFace.appendChild(marker);
+        // Configuração do jogo
+        const scenes = [
+            {
+                image: 'PrimeiraHora1.jpg',
+                text: 'Nas brumas densas onde a memória se esvai,\nUm véu se tece, e o coração se distrai.\nPerdição sutil, que a alma cega e confunde,\nUm eco distante, que o ser profundo inunde.'
+            },
+            {
+                image: 'PrimeiraHora2.png',
+                text: 'Como outrora um apóstolo, a chama que ardeu,\nNegou seu mestre, e em cinzas se perdeu.\nAssim, de um dia sombrio, a lembrança cruel,\nDevemos banir, qual amargo fel.'
+            },
+            {
+                image: 'PrimeiraHora2.png',
+                text: 'Deixemos que o tempo, com sua mão gentil,\nApague as marcas, do que foi tão vil.\nNo esquecimento, a paz pode nascer,\nE a perdição, enfim, fenecer.'
+            },
+            {
+                image: 'PrimeiraHora2.png',
+                text: 'E agora imploro, curvado e só,\nQue a memória se torne, enfim, em pó.\nComo o discípulo que, tremendo, fugiu,\nDai-me clemência pelo que o olho viu.'
+            },
+            {
+                image: 'PrimeiraHora3.png',
+                text: 'O Imperador'
             }
-            letras.forEach((letra, i) => {
-                const angulo = i * 36;
-                const rad = (angulo - 90) * (Math.PI / 180);
-                const x = centerX + letterRadius * Math.cos(rad);
-                const y = centerY + 30 + letterRadius * Math.sin(rad);
-                const btn = document.createElement('button');
-                btn.className = 'letter-btn';
-                btn.textContent = letra;
-                btn.style.left = `${x}px`;
-                btn.style.top = `${y}px`;
-                btn.addEventListener('click', () => {
-                    btn.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                    setTimeout(() => btn.style.transform = 'translate(-50%, -50%) scale(1)', 100);
-                    atualizarPonteiros(angulo);
-                    verificarSequencia(letra);
-                });
-                document.getElementById('container').appendChild(btn);
+        ];
+
+        let currentScene = 0;
+        let isPlayingFinalSequence = false;
+        const gameImage = document.getElementById('gameImage');
+        const dialogueText = document.getElementById('dialogueText');
+        const progress = document.getElementById('progress');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+
+        function startGame() {
+            document.getElementById('titleScreen').classList.add('hidden');
+
+            // Tentar iniciar a música de fundo
+            backgroundMusic.play().catch(e => {
+                console.log('Música não disponível ou bloqueada pelo navegador');
             });
-            atualizarForca();
-            atualizarTentativas();
-            atualizarPonteiros(0);
+
+            setTimeout(() => {
+                loadScene(0);
+                updateTimestamp();
+            }, 1000);
         }
 
-        window.onload = criarRelogio;
+        function triggerGlitch() {
+            gameImage.classList.add('glitch');
+            setTimeout(() => {
+                gameImage.classList.remove('glitch');
+            }, 300);
+        }
+
+        function loadScene(index) {
+            if (index < 0 || index >= scenes.length) return;
+            if (isPlayingFinalSequence) return;
+
+            currentScene = index;
+            const scene = scenes[index];
+
+            // Efeito de glitch aleatório
+            if (Math.random() > 0.5) {
+                triggerGlitch();
+            }
+
+            // Fade out da imagem atual
+            gameImage.classList.remove('active');
+
+            setTimeout(() => {
+                // Trocar imagem
+                gameImage.src = scene.image;
+
+                // Fade in da nova imagem
+                setTimeout(() => {
+                    gameImage.classList.add('active');
+                }, 50);
+
+                // RESETAR TEXTO - LIMPAR TUDO
+                resetDialogueText();
+
+                // Aplicar texto
+                dialogueText.textContent = scene.text;
+                dialogueText.style.opacity = '1';
+
+                // Atualizar progresso
+                progress.textContent = `FRAME ${index + 1} / ${scenes.length}`;
+            }, 300);
+        }
+
+        function resetDialogueText() {
+            // Limpar TODOS os estilos e classes
+            dialogueText.style.color = '#ccc';
+            dialogueText.style.fontSize = '22px';
+            dialogueText.style.position = 'static';
+            dialogueText.style.transform = 'none';
+            dialogueText.style.textShadow = '1px 1px 2px rgba(0,0,0,0.9)';
+            dialogueText.style.zIndex = '1';
+            dialogueText.style.opacity = '0';
+            dialogueText.style.fontWeight = 'normal';
+            dialogueText.style.left = 'auto';
+            dialogueText.style.top = 'auto';
+        }
+
+        function nextScene() {
+            if (isPlayingFinalSequence) return;
+
+            // Se estiver na última cena, executar efeito final
+            if (currentScene === scenes.length - 1) {
+                triggerFinalExplosion();
+                return;
+            }
+
+            if (currentScene < scenes.length - 1) {
+                loadScene(currentScene + 1);
+            }
+        }
+
+        function triggerFinalExplosion() {
+            isPlayingFinalSequence = true;
+
+            // Mostrar tela vermelha
+            const redScreen = document.getElementById('redScreen');
+            redScreen.style.display = 'block';
+
+            // Aplicar efeito de explosão via JavaScript
+            dialogueText.style.position = 'fixed';
+            dialogueText.style.top = '50%';
+            dialogueText.style.left = '50%';
+            dialogueText.style.transform = 'translate(-50%, -50%)';
+            dialogueText.style.zIndex = '9999';
+            dialogueText.style.fontWeight = 'bold';
+            dialogueText.style.color = '#ff0000';
+
+            // Animação de crescimento
+            let size = 22;
+            let opacity = 1;
+            let shadowIntensity = 20;
+
+            const growInterval = setInterval(() => {
+                size += 15;
+                shadowIntensity += 10;
+
+                dialogueText.style.fontSize = size + 'px';
+                dialogueText.style.textShadow = `
+                    0 0 ${shadowIntensity}px #ff0000,
+                    0 0 ${shadowIntensity * 2}px #ff0000,
+                    0 0 ${shadowIntensity * 3}px #ff0000
+                `;
+
+                if (size > 400) {
+                    opacity -= 0.05;
+                    dialogueText.style.opacity = opacity;
+                }
+
+                if (size >= 800) {
+                    clearInterval(growInterval);
+                }
+            }, 50);
+
+            // Fade da tela vermelha
+            let redOpacity = 0;
+            const redInterval = setInterval(() => {
+                redOpacity += 0.02;
+                redScreen.style.opacity = redOpacity;
+
+                if (redOpacity >= 1) {
+                    clearInterval(redInterval);
+                }
+            }, 50);
+
+            // Glitch intenso
+            const glitchInterval = setInterval(() => {
+                triggerGlitch();
+            }, 100);
+
+            // Após 3 segundos, fechar a página
+            setTimeout(() => {
+                clearInterval(growInterval);
+                clearInterval(redInterval);
+                clearInterval(glitchInterval);
+
+                // Fechar a janela/aba
+                window.close();
+
+                // Se window.close() não funcionar, redirecionar
+                setTimeout(() => {
+                    window.location.href = 'about:blank';
+                }, 100);
+            }, 3000);
+        }
+
+        function previousScene() {
+            if (isPlayingFinalSequence) return;
+
+            if (currentScene > 0) {
+                loadScene(currentScene - 1);
+            }
+        }
+
+        // Permitir navegação com teclas
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextScene();
+            } else if (e.key === 'ArrowLeft') {
+                previousScene();
+            }
+        });
+
+        // Permitir clique na tela para avançar
+        document.querySelector('.image-container').addEventListener('click', nextScene);
+
+        // Glitch aleatório ocasional
+        setInterval(() => {
+            if (Math.random() > 0.85 && !isPlayingFinalSequence) {
+                triggerGlitch();
+            }
+        }, 5000);
     </script>
 </body>
 </html>
